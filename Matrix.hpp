@@ -16,9 +16,9 @@
 #include<omp.h>
 #include <cmath>
 
-namespace Bo{
+namespace Bo {
 
-    template <typename T>
+    template<typename T>
     class Matrix {
 
     public:
@@ -28,37 +28,37 @@ namespace Bo{
             _rows = rows;
             _cols = cols;
 
-            _mat = new T* [rows];
-            for(int i =0;i<rows;i++)
-                _mat[i]=new T[cols];
-            for(int i=0;i<rows;i++)
-                for(int j=0;j<cols;j++)
-                    _mat[i][j]=0;
+            _mat = new T *[rows];
+            for (int i = 0; i < rows; i++)
+                _mat[i] = new T[cols];
+            for (int i = 0; i < rows; i++)
+                for (int j = 0; j < cols; j++)
+                    _mat[i][j] = 0;
         }
 
         Matrix(const Matrix<T> &matrix) {
-            _cols=matrix._cols;
-            _rows=matrix._rows;
-            _mat=new T* [matrix._rows];
+            _cols = matrix._cols;
+            _rows = matrix._rows;
+            _mat = new T *[matrix._rows];
 
-            for(int i =0;i<matrix._rows;i++)
-                _mat[i]=new T[matrix._cols];
-            for(int i=0;i<matrix._rows;i++)
-                for(int j=0;j<matrix._cols;j++)
-                    _mat[i][j]=matrix[i][j];
+            for (int i = 0; i < matrix._rows; i++)
+                _mat[i] = new T[matrix._cols];
+            for (int i = 0; i < matrix._rows; i++)
+                for (int j = 0; j < matrix._cols; j++)
+                    _mat[i][j] = matrix[i][j];
         }
 
         virtual ~Matrix() {
             if (_mat == nullptr)return;
-            for(int i =0;i<_rows;i++)
-                delete [] _mat[i];
-            delete [] _mat;
+            for (int i = 0; i < _rows; i++)
+                delete[] _mat[i];
+            delete[] _mat;
         }
 
         Matrix<T> transpose() {
             Matrix<T> transpose(_cols, _rows);
-            for(int i=0; i<_cols; ++i)
-                for(int j=0; j<_rows; ++j) {
+            for (int i = 0; i < _cols; ++i)
+                for (int j = 0; j < _rows; ++j) {
                     transpose[i][j] = _mat[j][i];
                 }
 
@@ -76,40 +76,54 @@ namespace Bo{
 //        T *getArray() const;
 
         void operator=(const Matrix<T> &matrix) {
-            for(int i=0;i<matrix._rows;i++)
-                for(int j=0;j<matrix._cols;j++)
-                    _mat[i][j]=matrix[i][j];
+            for (int i = 0; i < matrix._rows; i++)
+                for (int j = 0; j < matrix._cols; j++)
+                    _mat[i][j] = matrix[i][j];
             _rows = matrix._rows;
             _cols = matrix._cols;
         }
 
-        Matrix<T> operator -()const {
-            Matrix<T> temp(_rows,_cols);
-            for(int i=0;i<_rows;i++)
-                for(int j=0;j<_cols;j++)
-                    temp[i][j]= -_mat[i][j];
+        Matrix<T> operator-() const {
+            Matrix<T> temp(_rows, _cols);
+            for (int i = 0; i < _rows; i++)
+                for (int j = 0; j < _cols; j++)
+                    temp[i][j] = -_mat[i][j];
             return temp;
         }
 
-        Matrix<T> operator -(const Matrix<T> &matrix)const {
+        Matrix<T> operator-(const Matrix<T> &matrix) const {
             assert(_rows == matrix._rows && _cols == matrix._cols);
             Matrix temp(_rows, _cols);
-            for(int i=0;i<_rows;i++)
-                for(int j=0;j<_cols;j++)
-                    temp[i][j] = _mat[i][j]-matrix[i][j];
+            for (int i = 0; i < _rows; i++)
+                for (int j = 0; j < _cols; j++)
+                    temp[i][j] = _mat[i][j] - matrix[i][j];
             return temp;
         }
 
-        Matrix<T> operator +(const Matrix<T> &matrix)const {
+        Matrix<T> operator+(const Matrix<T> &matrix) const {
             assert(_rows == matrix._rows && _cols == matrix._cols);
-            Matrix temp(_rows,_cols);
-            for(int i=0;i<_rows;i++)
-                for(int j=0;j<_cols;j++)
-                    temp.Mat[i][j]+=matrix[i][j]+_mat[i][j];
+            Matrix temp(_rows, _cols);
+            for (int i = 0; i < _rows; i++)
+                for (int j = 0; j < _cols; j++)
+                    temp.Mat[i][j] += matrix[i][j] + _mat[i][j];
             return temp;
         }
 
-        Matrix<T> operator *(const Matrix<T> &matrix)const {
+        friend Matrix<T> operator+(const T &num, const Matrix<T> &t) {
+            Matrix<T> res = t;
+            for (int i = 0; i < res._rows; ++i) {
+                for (int j = 0; j < res._cols; ++j) {
+                    res._mat[i][j] += num;
+                }
+            }
+            return res;
+        }
+
+        Matrix<T> operator+(const T &num) const {
+            return num + *this;
+        }
+
+        Matrix<T> operator*(const Matrix<T> &matrix) const {
             assert(_cols == matrix._rows);
             Matrix<T> res(_rows, matrix._cols);
 
@@ -125,56 +139,52 @@ namespace Bo{
             return res;
         }
 
-        Matrix<T> operator *(const T &num)const {
+        Matrix<T> operator*(const T &num) const {
             Matrix temp(_rows, _cols);
-            for(int i=0;i<_rows;i++)
-                #pragma omp for
-                for(int j=0;j<_cols;j++)
-                    temp[i][j]=_mat[i][j]*num;
+            for (int i = 0; i < _rows; i++)
+                    #pragma omp for
+                    for (int j = 0; j < _cols; j++)
+                        temp[i][j] = _mat[i][j] * num;
             return temp;
         }
 
-        bool operator == (const Matrix<T>& m){
-            if(_cols != m._cols || _rows != m._rows)return false;
-            for(int i=0;i<m._rows;i++){
-                for(int j=0;j<m._cols;j++){
-                    if(std::fabs(m[i][j] - _mat[i][j]) > 1e-9)return false;
+        friend Matrix<T> operator*(const T &num, const Matrix<T> &m) {
+            return m * num;
+        }
+
+        bool operator==(const Matrix<T> &m) {
+            if (_cols != m._cols || _rows != m._rows)return false;
+            for (int i = 0; i < m._rows; i++) {
+                for (int j = 0; j < m._cols; j++) {
+                    if (std::fabs(m[i][j] - _mat[i][j]) > 1e-9)return false;
                 }
             }
             return true;
         }
 
-        inline T* & operator[](const size_t &index) const {
-            return  _mat[index];
-        }
-
-        friend  Matrix<T> operator *(const int & num,const Matrix<T> &m) {
-            return (m*num);
-        }
-
-        friend Matrix<T> operator +(const int &num,const Matrix<T> &t) {
-            return (num+t);
+        inline T *&operator[](const size_t &index) const {
+            return _mat[index];
         }
 
         friend std::ostream &operator<<(std::ostream &os, const Matrix<T> &m) {
-            for (int i=0; i < m._rows; ++i) {
-                for (int j=0; j < m._cols; ++j) {
-                    os << std::to_string(m[i][j]) << "  " ;
+            for (int i = 0; i < m._rows; ++i) {
+                for (int j = 0; j < m._cols; ++j) {
+                    os << std::to_string(m[i][j]) << "  ";
                 }
                 os << '\n';
             }
             return os;
         }
 
-        Matrix<T>& operator<<(T x) {
+        Matrix<T> &operator<<(T x) {
             _mat[0][0] = x;
-            printf("operator << : ind = %d\n_mat[0][0] = %lf;\n", _ind, x);
+//            printf("operator << : ind = %d\n_mat[0][0] = %lf;\n", _ind, x);
             ++_ind;
             return *this;
         }
 
-        Matrix<T>& operator , (T x) {
-            _mat[_ind / _cols][_ind -  _cols * (_ind / _cols)] = x;
+        Matrix<T> &operator,(T x) {
+            _mat[_ind / _cols][_ind - _cols * (_ind / _cols)] = x;
             ++_ind;
             return *this;
         }
@@ -190,10 +200,7 @@ namespace Bo{
     };
 
 
-
-
 }
-
 
 
 #endif //BOMATRIX_MATRIX_HPP

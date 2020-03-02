@@ -34,6 +34,19 @@ void testMultiplication(){
 
     assert(m3 == (m1 * m2));
 
+
+    BoMatrixXd m1_2(3, 2);
+    m1 <<
+    2.0, 4.0,
+    6.0, 8.0,
+    10.0, 12.0;
+
+    assert(m1_2 == (m1 * 2));
+    assert(m1_2 == (2 * m1));
+
+
+
+
     end = clock();
     printf("total time=%fs\n", (float)(end - start) / CLOCKS_PER_SEC);
 
@@ -66,11 +79,35 @@ void testTranspose(){
 
 }
 
+void testOperatorPlus(){
+    clock_t start, end;
+    start = clock();
 
+    BoMatrixXd m1(3, 2);
+    m1 <<
+    1.0, 2.0,
+    3.0, 4.0,
+    5.0, 6.0;
+
+    std::cout << "m1 = \n" << m1 << std::endl;
+
+    BoMatrixXd m2(3, 2);
+    m2 <<
+    2.0, 3.0,
+    4.0, 5.0,
+    6.0, 7.0;
+    assert(m2 == (m1 + 1.0));
+    assert(m2 == (1.0 + m1));
+
+    end = clock();
+    printf("total time=%fs\n", (float)(end - start) / CLOCKS_PER_SEC);
+    printf("testOperatorPlus PASSED!\n");
+}
 
 int main(void){
 
     testTranspose();
     testMultiplication();
+    testOperatorPlus();
 
 }
