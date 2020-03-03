@@ -15,13 +15,13 @@ void testMultiplication(){
        3.0, 4.0,
        5.0, 6.0;
 
-    std::cout << "m1 = \n" << m1 << std::endl;
+//    std::cout << "m1 = \n" << m1 << std::endl;
 
     m2 <<
        1.0, 2.0, 3.0,
        4.0, 5.0, 6.0;
 
-    std::cout << "m2 = \n" << m2 << std::endl;
+//    std::cout << "m2 = \n" << m2 << std::endl;
 
 
     BoMatrixXd m3(3, 3);
@@ -30,13 +30,13 @@ void testMultiplication(){
        19, 26, 33,
        29, 40, 51;
 
-    std::cout << "m3 = \n" << m3 << std::endl;
+//    std::cout << "m3 = \n" << m3 << std::endl;
 
     assert(m3 == (m1 * m2));
 
 
     BoMatrixXd m1_2(3, 2);
-    m1 <<
+    m1_2 <<
     2.0, 4.0,
     6.0, 8.0,
     10.0, 12.0;
@@ -65,7 +65,7 @@ void testTranspose(){
     3.0, 4.0,
     5.0, 6.0;
 
-    std::cout << "m1 = \n" << m1 << std::endl;
+//    std::cout << "m1 = \n" << m1 << std::endl;
 
     BoMatrixXd m1t(2, 3);
     m1t <<
@@ -89,7 +89,7 @@ void testOperatorPlus(){
     3.0, 4.0,
     5.0, 6.0;
 
-    std::cout << "m1 = \n" << m1 << std::endl;
+//    std::cout << "m1 = \n" << m1 << std::endl;
 
     BoMatrixXd m2(3, 2);
     m2 <<
